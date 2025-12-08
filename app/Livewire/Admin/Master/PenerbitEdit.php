@@ -43,7 +43,7 @@ class PenerbitEdit extends Component
             'email_penerbit' => $this->email_penerbit,
         ]);
 
-        session()->flash('message', 'Penerbit berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Penerbit berhasil diperbarui.');
         return redirect()->route('penerbit.index');
     }
 

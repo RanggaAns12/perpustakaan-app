@@ -15,6 +15,13 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Animasi Bounce untuk Icon Sukses */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+            50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+        }
+        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-900" 
@@ -30,207 +37,42 @@
         }
     }">
 
-    {{-- 1. OVERLAY MOBILE --}}
+    {{-- LOGIKA PENENTUAN NAMA TAMPILAN --}}
+    @php
+        $user = Auth::user();
+        $displayName = $user->username; // Default (Misal Admin)
+
+        if ($user->isPustakawan() && $user->pustakawan) {
+            $displayName = $user->pustakawan->nama_lengkap;
+        } elseif ($user->isGuru() && $user->guru) {
+            $displayName = $user->guru->nama_lengkap;
+        } elseif ($user->isSiswa() && $user->siswa) {
+            $displayName = $user->siswa->nama_lengkap;
+        }
+        
+        // Ambil inisial 2 huruf pertama dari nama
+        $initials = collect(explode(' ', $displayName))->map(fn($segment) => $segment[0] ?? '')->take(2)->join('');
+    @endphp
+
+    {{-- 1. BACKGROUND DEKORATIF --}}
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-0 -left-10 w-96 h-96 bg-purple-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute top-0 -right-10 w-96 h-96 bg-indigo-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-20 left-20 w-96 h-96 bg-pink-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
+    {{-- 2. OVERLAY MOBILE --}}
     <div x-show="sidebarOpen" 
          @click="sidebarOpen = false"
-         x-transition:enter="transition-opacity ease-linear duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-linear duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
+         x-transition.opacity
          class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 lg:hidden"
          x-cloak>
     </div>
 
-    {{-- 2. SIDEBAR --}}
-    <aside 
-        class="fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-xl lg:shadow-none overflow-hidden"
-        :class="{ 
-            'translate-x-0': sidebarOpen, 
-            '-translate-x-full': !sidebarOpen,
-            'lg:translate-x-0': true, 
-            'w-64': !sidebarCollapsed, 
-            'lg:w-20': sidebarCollapsed
-        }"
-        x-cloak>
-        
-        {{-- Sidebar Header --}}
-        <div class="h-16 flex items-center justify-center border-b border-gray-100 bg-white whitespace-nowrap">
-            <div class="flex items-center gap-3 transition-opacity duration-300"
-                 x-show="!sidebarCollapsed">
-                <img src="{{ Vite::asset('resources/images/logo.png') }}" alt="Logo" class="h-8 w-auto">
-                <span class="font-bold text-xl tracking-tight text-gray-800">SMA<span class="text-indigo-600">NSATARA</span></span>
-            </div>
+    {{-- 3. SIDEBAR COMPONENT --}}
+    <x-layouts.sidebar />
 
-            <div class="hidden lg:block" x-show="sidebarCollapsed" x-transition>
-                <img src="{{ Vite::asset('resources/images/logo.png') }}" alt="Logo" class="h-9 w-9">
-            </div>
-        </div>
-
-        {{-- Sidebar Navigation --}}
-        <nav class="p-4 space-y-1.5 overflow-y-auto h-[calc(100vh-4rem)] custom-scrollbar">
-            
-            {{-- Menu Dashboard --}}
-            <a href="{{ route('dashboard') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-home class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
-                
-                {{-- Tooltip saat collapsed --}}
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">
-                    Dashboard
-                </div>
-            </a>
-
-            <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
-
-            {{-- LABEL: MASTER DATA --}}
-            <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all">
-                Master Data
-            </div>
-
-            {{-- Menu Data Buku --}}
-            <a href="{{ route('buku.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('buku.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-book-open class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Buku</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Buku</div>
-            </a>
-
-            {{-- Menu Kategori --}}
-            <a href="{{ route('kategori.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('kategori.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-tag class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Kategori</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Kategori</div>
-            </a>
-
-            {{-- Menu Penerbit --}}
-            <a href="{{ route('penerbit.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('penerbit.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-building-office-2 class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Penerbit</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Penerbit</div>
-            </a>
-
-            {{-- Menu Penulis --}}
-            <a href="{{ route('penulis.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('penulis.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-pencil-square class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Penulis</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Penulis</div>
-            </a>
-            
-            {{-- LABEL: DATA SEKOLAH --}}
-            <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider mt-4">
-                Data Sekolah
-            </div>
-
-            {{-- Menu Data Kelas --}}
-            <a href="{{ route('kelas.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('kelas.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-academic-cap class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Kelas</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Kelas</div>
-            </a>
-
-            {{-- Menu Tahun Ajaran --}}
-            <a href="{{ route('tahun-ajaran.index') }}" wire:navigate
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('tahun-ajaran.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-calendar-days class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Tahun Ajaran</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Tahun Ajaran</div>
-            </a>
-
-            {{-- Menu Jurusan --}}
-            <a href="{{ route('jurusan.index') }}" wire:navigate
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('jurusan.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-briefcase class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Jurusan</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Jurusan</div>
-            </a>
-
-            {{-- Menu Data Guru --}}
-            <a href="{{ route('guru.index') }}" wire:navigate
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('guru.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-user-group class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Guru</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Guru</div>
-            </a>
-
-            {{-- Menu Pustakawan --}}
-            <a href="{{ route('pustakawan.index') }}" wire:navigate
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('pustakawan.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-user-circle class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Pustakawan</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Pustakawan</div>
-            </a>
-
-            {{-- Menu Siswa --}}
-            <a href="{{ route('siswa.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('siswa.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-users class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Siswa</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Siswa</div>
-            </a>
-
-            <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
-
-            {{-- LABEL: SIRKULASI --}}
-            <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                Sirkulasi
-            </div>
-
-            {{-- Menu Peminjaman --}}
-            <a href="{{ route('peminjaman.index') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('peminjaman.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-clipboard-document-check class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Peminjaman</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Peminjaman</div>
-            </a>
-
-            {{-- Menu Laporan --}}
-            <a href="{{ route('laporan.aktivitas') }}" wire:navigate
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('laporan.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <x-heroicon-o-chart-bar class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Laporan</span>
-                <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Laporan</div>
-            </a>
-
-            {{-- --- BAGIAN BARU: PENGATURAN LANDING PAGE (KHUSUS ADMIN) --- --}}
-            @if(Auth::user()->isAdmin())
-                <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
-
-                {{-- LABEL: PENGATURAN --}}
-                <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Pengaturan
-                </div>
-
-                <a href="{{ route('setting.landing-page') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('setting.landing-page') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-cog-6-tooth class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Landing Page</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Landing Page</div>
-                </a>
-            @endif
-            {{-- --- AKHIR BAGIAN BARU --- --}}
-
-            {{-- Tombol Keluar --}}
-            <div class="mt-auto pt-8 pb-4">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 group relative">
-                        <x-heroicon-o-arrow-left-on-rectangle class="w-6 h-6 shrink-0" />
-                        <span x-show="!sidebarCollapsed" class="whitespace-nowrap font-medium">Keluar Aplikasi</span>
-                        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Keluar</div>
-                    </button>
-                </form>
-            </div>
-        </nav>
-    </aside>
-
-    {{-- 3. MAIN CONTENT WRAPPER --}}
+    {{-- 4. MAIN CONTENT WRAPPER --}}
     <div 
         class="transition-all duration-300 ease-in-out min-h-screen flex flex-col"
         :class="{ 
@@ -251,23 +93,22 @@
 
             {{-- Right: Profile Dropdown --}}
             <div class="flex items-center gap-4" x-data="{ open: false }">
-                
                 {{-- Notifikasi --}}
                 <button class="relative p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition">
                     <x-heroicon-o-bell class="w-6 h-6" />
                     <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
                 </button>
 
-                {{-- User Profile Trigger --}}
+                {{-- User Profile --}}
                 <div class="relative">
                     <button @click="open = !open" @click.away="open = false" class="flex items-center gap-3 focus:outline-none group">
                         <div class="text-right hidden md:block">
-                            <p class="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition">{{ Auth::user()->username }}</p>
+                            <p class="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition truncate max-w-[150px] text-right">{{ $displayName }}</p>
                             <p class="text-xs text-gray-500">{{ Auth::user()->getRoleName() }}</p>
                         </div>
                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-md group-hover:shadow-lg transition duration-300">
                             <div class="h-full w-full bg-white rounded-full flex items-center justify-center">
-                                <span class="text-indigo-600 font-bold text-sm">{{ substr(Auth::user()->username, 0, 2) }}</span>
+                                <span class="text-indigo-600 font-bold text-sm uppercase">{{ $initials }}</span>
                             </div>
                         </div>
                         <x-heroicon-o-chevron-down class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition duration-200" x-bind:class="{'rotate-180': open}" />
@@ -286,11 +127,18 @@
                         
                         <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
                             <p class="text-sm font-medium text-gray-500">Masuk sebagai</p>
-                            <p class="text-sm font-bold text-gray-900 truncate">{{ Auth::user()->username }}</p>
+                            <p class="text-sm font-bold text-gray-900 truncate">{{ $displayName }}</p>
                         </div>
 
+                        {{-- Dynamic Profile Link based on Role --}}
                         <div class="py-2">
-                            <a href="#" class="flex items-center gap-3 px-6 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors group">
+                            @php
+                                $profileRoute = '#';
+                                if(Auth::user()->isPustakawan()) $profileRoute = route('pustakawan.profile');
+                                elseif(Auth::user()->isGuru()) $profileRoute = route('guru.profile');
+                            @endphp
+                            
+                            <a href="{{ $profileRoute }}" class="flex items-center gap-3 px-6 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors group">
                                 <div class="p-1.5 bg-gray-100 rounded-lg text-gray-500 group-hover:bg-white group-hover:text-indigo-600 group-hover:shadow-sm transition">
                                     <x-heroicon-o-user class="w-4 h-4" />
                                 </div>
@@ -325,6 +173,63 @@
         <footer class="bg-white border-t border-gray-200 py-4 px-6 text-center md:text-left text-sm text-gray-500">
             &copy; {{ date('Y') }} Sistem Informasi Perpustakaan. All rights reserved.
         </footer>
+    </div>
+
+    {{-- ================================================= --}}
+    {{--              GLOBAL SUCCESS MODAL                 --}}
+    {{-- ================================================= --}}
+    <div x-data="{ 
+            show: false, 
+            message: '',
+            init() {
+                // 1. Cek jika ada Flash Message dari Session (saat redirect/reload)
+                @if(session()->has('message'))
+                    this.message = '{{ session('message') }}';
+                    this.show = true;
+                    setTimeout(() => this.show = false, 3000); // Auto close 3 detik
+                @endif
+
+                // 2. Dengarkan Event Livewire (saat update tanpa reload)
+                Livewire.on('show-success', (data) => {
+                    // Data bisa berupa object atau string langsung
+                    this.message = (typeof data === 'string') ? data : data.message; 
+                    this.show = true;
+                    setTimeout(() => this.show = false, 3000);
+                });
+            }
+         }"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform scale-90"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-90"
+         class="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 pointer-events-none"
+         style="display: none;">
+        
+        {{-- Modal Card --}}
+        <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 max-w-sm w-full pointer-events-auto flex flex-col items-center text-center relative overflow-hidden">
+            
+            {{-- Hiasan Background Card --}}
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+            
+            {{-- Icon Check Animated --}}
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600 animate-bounce-slow">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+            </div>
+
+            {{-- Text --}}
+            <h3 class="text-xl font-bold text-gray-900">Berhasil!</h3>
+            <p class="text-gray-500 mt-2 text-sm" x-text="message"></p>
+
+            {{-- Tombol Tutup --}}
+            <button @click="show = false" class="mt-6 px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl text-sm transition w-full">
+                Tutup
+            </button>
+        </div>
     </div>
 
 </body>

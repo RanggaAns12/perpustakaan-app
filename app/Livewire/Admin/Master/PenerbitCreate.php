@@ -30,7 +30,7 @@ class PenerbitCreate extends Component
             'email_penerbit' => $this->email_penerbit,
         ]);
 
-        session()->flash('message', 'Penerbit berhasil ditambahkan.');
+        $this->dispatch('show-success', message: 'Penerbit berhasil ditambahkan.');
         return redirect()->route('penerbit.index');
     }
 

@@ -37,7 +37,7 @@ class KategoriEdit extends Component
             'deskripsi' => $this->deskripsi,
         ]);
 
-        session()->flash('message', 'Kategori berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Kategori berhasil diperbarui.');
         return redirect()->route('kategori.index');
     }
 

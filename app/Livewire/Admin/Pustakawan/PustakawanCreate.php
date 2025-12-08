@@ -70,8 +70,7 @@ class PustakawanCreate extends Component
             ]);
         });
 
-        session()->flash('message', 'Pustakawan berhasil ditambahkan. Login default: NIP / pustakawan123');
-        return redirect()->route('pustakawan.index');
+       $this->dispatch('show-success', message: 'Pustakawan berhasil ditambahkan. Login default: NIP / pustakawan123');
     }
 
     public function render()

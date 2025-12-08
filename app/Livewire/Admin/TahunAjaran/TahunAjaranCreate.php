@@ -40,7 +40,7 @@ class TahunAjaranCreate extends Component
             'is_aktif' => $this->is_aktif,
         ]);
 
-        session()->flash('message', 'Periode akademik berhasil ditambahkan.');
+        $this->dispatch('show-success', message: 'Tahun ajaran berhasil dibuat.');
         return redirect()->route('tahun-ajaran.index');
     }
 

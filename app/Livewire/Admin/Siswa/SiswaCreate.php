@@ -79,7 +79,7 @@ class SiswaCreate extends Component
             ]);
         });
 
-        session()->flash('message', 'Siswa berhasil ditambahkan. Login: NIS / siswa123');
+       $this->dispatch('show-success', message: 'Siswa berhasil ditambahkan. Login: NIS / siswa123');
         return redirect()->route('siswa.index');
     }
 

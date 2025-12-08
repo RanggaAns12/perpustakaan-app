@@ -108,7 +108,7 @@ class SiswaEdit extends Component
             'telepon_orangtua' => $this->telepon_orangtua,
         ]);
 
-        session()->flash('message', 'Data siswa berhasil diperbarui.');
+       $this->dispatch('show-success', message: 'Siswa berhasil diperbarui.');
         return redirect()->route('siswa.index');
     }
 

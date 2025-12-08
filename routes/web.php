@@ -68,6 +68,17 @@ use App\Livewire\Admin\Peminjaman\PeminjamanCreate;
 use App\Livewire\Admin\Peminjaman\PeminjamanShow;
 use App\Livewire\Admin\Laporan\LaporanIndex;
 
+//Pustakawan Routes
+use App\Livewire\Pustakawan\Dashboard as PustakawanDashboard;
+use App\Livewire\Pustakawan\SirkulasiIndex;
+use App\Livewire\Pustakawan\BukuList;
+use App\Livewire\Pustakawan\Profile; // Import class
+
+//Guru Routes
+use App\Livewire\Guru\Dashboard as GuruDashboard;
+use App\Livewire\Guru\BukuList as GuruBukuList;
+use App\Livewire\Guru\Profile as GuruProfile;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -154,5 +165,25 @@ Route::middleware('auth')->group(function () {
     // --- MODULE: Laporan ---
     Route::get('/laporan', LaporanIndex::class)->name('laporan.index');
     Route::get('/laporan/aktivitas', LaporanIndex::class)->name('laporan.aktivitas'); 
+
+
+    Route::middleware(['auth', 'role:Pustakawan'])->prefix('pustakawan')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', PustakawanDashboard::class)->name('pustakawan.dashboard');
+        // Sirkulasi
+        Route::get('/sirkulasi', SirkulasiIndex::class)->name('pustakawan.sirkulasi');
+        // Create Transaksi (Menggunakan Logic Admin, tapi diakses Pustakawan)
+        Route::get('/transaksi/baru', PeminjamanCreate::class)->name('pustakawan.transaksi.create');
+        // Katalog Buku (Read Only)
+        Route::get('/buku', BukuList::class)->name('pustakawan.buku');
+        // Route Profil
+        Route::get('/profile', Profile::class)->name('pustakawan.profile');
+    });
+
+    Route::middleware(['auth', 'role:Guru'])->prefix('guru')->group(function () {
+        Route::get('/dashboard', GuruDashboard::class)->name('guru.dashboard');
+        Route::get('/katalog-buku', GuruBukuList::class)->name('guru.buku');
+        Route::get('/profil', GuruProfile::class)->name('guru.profile');
+    });
 
 });

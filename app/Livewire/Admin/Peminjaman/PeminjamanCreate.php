@@ -88,7 +88,7 @@ class PeminjamanCreate extends Component
             $buku->decrement('jumlah_eksemplar_tersedia');
         });
 
-        session()->flash('message', 'Transaksi berhasil dibuat.');
+        $this->dispatch('show-success', message: 'Transaksi berhasil dibuat.');
         return redirect()->route('peminjaman.index');
     }
 

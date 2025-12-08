@@ -17,7 +17,7 @@ class JurusanCreate extends Component
             'nama_jurusan' => $this->nama_jurusan,
             'kode_jurusan' => strtoupper($this->kode_jurusan),
         ]);
-        session()->flash('message', 'Jurusan berhasil ditambahkan.');
+        $this->dispatch('show-success', message: 'Jurusan berhasil ditambahkan.');
         return redirect()->route('jurusan.index');
     }
 

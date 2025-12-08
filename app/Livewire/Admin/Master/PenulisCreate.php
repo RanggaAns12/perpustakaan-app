@@ -25,7 +25,7 @@ class PenulisCreate extends Component
             'kebangsaan' => $this->kebangsaan,
         ]);
 
-        session()->flash('message', 'Penulis berhasil ditambahkan.');
+        $this->dispatch('show-success', message: 'Penulis berhasil ditambahkan.');
         return redirect()->route('penulis.index');
     }
 

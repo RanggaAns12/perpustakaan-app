@@ -83,7 +83,7 @@ class PustakawanEdit extends Component
             ]);
         });
 
-        session()->flash('message', 'Data pustakawan berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Pustakawan berhasil diperbarui.');
         return redirect()->route('pustakawan.index');
     }
 

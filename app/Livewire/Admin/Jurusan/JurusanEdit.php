@@ -32,7 +32,7 @@ class JurusanEdit extends Component
             'kode_jurusan' => strtoupper($this->kode_jurusan),
         ]);
 
-        session()->flash('message', 'Jurusan berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Jurusan berhasil diperbarui.');
         return redirect()->route('jurusan.index');
     }
 

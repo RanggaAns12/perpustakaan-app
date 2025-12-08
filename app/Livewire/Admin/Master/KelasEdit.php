@@ -48,7 +48,7 @@ class KelasEdit extends Component
             'kapasitas' => $this->kapasitas,
             'ruangan' => $this->ruangan,
         ]);
-        session()->flash('message', 'Kelas berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Kelas berhasil diperbarui.');
         return redirect()->route('kelas.index');
     }
 

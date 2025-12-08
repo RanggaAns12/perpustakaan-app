@@ -53,7 +53,7 @@ class KelasCreate extends Component
             'ruangan' => $this->ruangan,
         ]);
         
-        session()->flash('message', 'Kelas berhasil dibuat.');
+        $this->dispatch('show-success', message: 'Kelas berhasil dibuat.');
         return redirect()->route('kelas.index');
     }
 

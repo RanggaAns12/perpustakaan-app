@@ -41,7 +41,7 @@ class TahunAjaranEdit extends Component
             'is_aktif' => $this->is_aktif,
         ]);
 
-        session()->flash('message', 'Data tahun ajaran diperbarui.');
+       $this->dispatch('show-success', message: 'Tahun ajaran berhasil diperbarui.');
         return redirect()->route('tahun-ajaran.index');
     }
 

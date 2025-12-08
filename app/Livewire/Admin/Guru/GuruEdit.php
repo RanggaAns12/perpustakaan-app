@@ -96,7 +96,7 @@ class GuruEdit extends Component
             ]);
         });
 
-        session()->flash('message', 'Data guru berhasil diperbarui.');
+       $this->dispatch('show-success', message: 'Profil Guru Anda berhasil diperbarui.');
         return redirect()->route('guru.index');
     }
 

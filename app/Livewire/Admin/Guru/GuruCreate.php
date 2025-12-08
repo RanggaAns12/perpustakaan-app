@@ -88,7 +88,7 @@ class GuruCreate extends Component
             ]);
         });
 
-        session()->flash('message', 'Data guru berhasil ditambahkan. Login default menggunakan NIP.');
+       $this->dispatch('show-success', message: 'Data guru berhasil ditambahkan. Login default menggunakan NIP.');
         return redirect()->route('guru.index');
     }
 

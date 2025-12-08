@@ -105,7 +105,7 @@ class BukuEdit extends Component
         // Sync Penulis (Update relasi Many-to-Many)
         $buku->penulis()->sync($this->selected_penulis);
 
-        session()->flash('message', 'Data buku berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Data buku berhasil diperbarui.');
         return redirect()->route('buku.index');
     }
 

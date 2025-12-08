@@ -26,7 +26,7 @@ class KategoriCreate extends Component
             'deskripsi' => $this->deskripsi,
         ]);
 
-        session()->flash('message', 'Kategori berhasil ditambahkan.');
+        $this->dispatch('show-success', message: 'Kategori berhasil ditambahkan.');
         return redirect()->route('kategori.index');
     }
 

@@ -35,7 +35,7 @@ class PenulisEdit extends Component
             'kebangsaan' => $this->kebangsaan,
         ]);
 
-        session()->flash('message', 'Data penulis berhasil diperbarui.');
+        $this->dispatch('show-success', message: 'Penulis berhasil diperbarui.');
         return redirect()->route('penulis.index');
     }
 

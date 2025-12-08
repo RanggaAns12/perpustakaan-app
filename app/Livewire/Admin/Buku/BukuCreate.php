@@ -76,7 +76,7 @@ class BukuCreate extends Component
         // Attach Penulis (Many-to-Many)
         $buku->penulis()->attach($this->selected_penulis);
 
-        session()->flash('message', 'Buku berhasil ditambahkan!');
+        $this->dispatch('show-success', message: 'Buku berhasil ditambahkan!');
         return redirect()->route('buku.index');
     }
 
