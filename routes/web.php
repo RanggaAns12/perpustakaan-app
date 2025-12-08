@@ -79,6 +79,8 @@ use App\Livewire\Guru\Dashboard as GuruDashboard;
 use App\Livewire\Guru\BukuList as GuruBukuList;
 use App\Livewire\Guru\Profile as GuruProfile;
 
+//siswa Routes
+use App\Livewire\Siswa\Dashboard as SiswaDashboard;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -184,6 +186,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', GuruDashboard::class)->name('guru.dashboard');
         Route::get('/katalog-buku', GuruBukuList::class)->name('guru.buku');
         Route::get('/profil', GuruProfile::class)->name('guru.profile');
+    });
+
+    Route::middleware(['auth', 'role:Siswa'])->prefix('siswa')->group(function () {
+        // Route ini menggunakan layout 'components.layouts.siswa' (tanpa sidebar)
+        // karena sudah didefinisikan di dalam Class Component-nya
+        Route::get('/dashboard', SiswaDashboard::class)->name('siswa.dashboard');
     });
 
 });

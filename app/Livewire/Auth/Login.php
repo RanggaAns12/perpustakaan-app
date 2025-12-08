@@ -25,28 +25,29 @@ class Login extends Component
     // Method ini yang dipanggil saat form di-submit (wire:submit="login")
     public function login()
     {
-        // 1. Validasi Input
         $this->validate();
 
-        // 2. Coba Login
-        // Kita cek 'is_active' juga sesuai struktur database Anda
         if (Auth::attempt(['username' => $this->username, 'password' => $this->password, 'is_active' => true])) {
             
-            // Regenerasi session untuk keamanan (Fixation attack protection)
             session()->regenerate();
-
-            // Update last_login di database
+            
             $user = Auth::user();
             $user->update(['last_login' => now()]);
 
-            // Redirect ke dashboard atau halaman yang diminta sebelumnya
+            // --- PERBAIKAN LOGIKA REDIRECT ---
+            if ($user->isSiswa()) {
+                return redirect()->route('siswa.dashboard'); // Arahkan ke Dashboard Khusus Siswa
+            } elseif ($user->isPustakawan()) {
+                return redirect()->route('pustakawan.dashboard');
+            } elseif ($user->isGuru()) {
+                return redirect()->route('guru.dashboard');
+            }
+
+            // Default untuk Admin
             return redirect()->intended(route('dashboard'));
         }
 
-        // 3. Jika Gagal
         $this->addError('username', 'Username atau password salah, atau akun tidak aktif.');
-        
-        // Reset password field
         $this->password = '';
     }
 }
