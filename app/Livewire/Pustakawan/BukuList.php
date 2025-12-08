@@ -11,11 +11,18 @@ class BukuList extends Component
     use WithPagination;
     public $search = '';
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $bukus = Buku::with(['kategori', 'penulis'])
-            ->where('judul_buku', 'like', '%' . $this->search . '%')
-            ->orWhere('isbn', 'like', '%' . $this->search . '%')
+            ->where(function($q) {
+                $q->where('judul_buku', 'like', '%' . $this->search . '%')
+                  ->orWhere('isbn', 'like', '%' . $this->search . '%');
+            })
             ->latest()
             ->paginate(12);
 

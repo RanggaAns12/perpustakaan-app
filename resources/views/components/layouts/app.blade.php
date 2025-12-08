@@ -93,11 +93,8 @@
 
             {{-- Right: Profile Dropdown --}}
             <div class="flex items-center gap-4" x-data="{ open: false }">
-                {{-- Notifikasi --}}
-                <button class="relative p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition">
-                    <x-heroicon-o-bell class="w-6 h-6" />
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                </button>
+                {{-- Notifikasi Component --}}
+                <livewire:partial.navbar-notifikasi />
 
                 {{-- User Profile --}}
                 <div class="relative">

@@ -1,136 +1,125 @@
- {{-- Menu Dashboard --}}
-                <a href="{{ route('dashboard') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-home class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Dashboard</div>
-                </a>
+<div class="space-y-1">
+    {{-- DASHBOARD --}}
+    <a href="{{ route('dashboard') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('dashboard') ? 'bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-200' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+       
+        <x-heroicon-o-home class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap font-medium text-sm">Dashboard</span>
+        
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Dashboard</div>
+    </a>
 
-                <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
+    {{-- MASTER DATA --}}
+    <div class="border-t border-slate-100 my-4 mx-2" x-show="!sidebarCollapsed"></div>
+    <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider transition-opacity duration-300">Master Data</div>
 
-                {{-- LABEL: MASTER DATA --}}
-                <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all">
-                    Master Data
-                </div>
+    @php
+        $menus = [
+            ['route' => 'buku.index', 'label' => 'Data Buku', 'icon' => 'book-open', 'active' => 'buku.*'],
+            ['route' => 'kategori.index', 'label' => 'Kategori', 'icon' => 'tag', 'active' => 'kategori.*'],
+            ['route' => 'penerbit.index', 'label' => 'Penerbit', 'icon' => 'building-office-2', 'active' => 'penerbit.*'],
+            ['route' => 'penulis.index', 'label' => 'Penulis', 'icon' => 'pencil-square', 'active' => 'penulis.*'],
+        ];
+    @endphp
 
-                {{-- Menu Data Buku --}}
-                <a href="{{ route('buku.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('buku.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-book-open class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Buku</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Buku</div>
-                </a>
+    @foreach($menus as $menu)
+        <a href="{{ route($menu['route']) }}" wire:navigate
+           class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs($menu['active']) ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+           :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+            
+            @if($menu['icon'] == 'book-open') <x-heroicon-o-book-open class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'tag') <x-heroicon-o-tag class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'building-office-2') <x-heroicon-o-building-office-2 class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'pencil-square') <x-heroicon-o-pencil-square class="w-5 h-5 shrink-0" />
+            @endif
 
-                {{-- Menu Kategori --}}
-                <a href="{{ route('kategori.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('kategori.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-tag class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Kategori</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Kategori</div>
-                </a>
+            <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">{{ $menu['label'] }}</span>
+            <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">{{ $menu['label'] }}</div>
+        </a>
+    @endforeach
 
-                {{-- Menu Penerbit --}}
-                <a href="{{ route('penerbit.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('penerbit.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-building-office-2 class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Penerbit</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Penerbit</div>
-                </a>
+    {{-- ADMINISTRASI --}}
+    <div class="border-t border-slate-100 my-4 mx-2" x-show="!sidebarCollapsed"></div>
+    <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider transition-opacity duration-300">Data Sekolah</div>
 
-                {{-- Menu Penulis --}}
-                <a href="{{ route('penulis.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('penulis.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-pencil-square class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Penulis</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Penulis</div>
-                </a>
-                
-                {{-- LABEL: DATA SEKOLAH --}}
-                <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider mt-4">
-                    Data Sekolah
-                </div>
+    @foreach([
+        ['route' => 'kelas.index', 'label' => 'Data Kelas', 'icon' => 'academic-cap', 'active' => 'kelas.*'],
+        ['route' => 'tahun-ajaran.index', 'label' => 'Tahun Ajaran', 'icon' => 'calendar-days', 'active' => 'tahun-ajaran.*'],
+        ['route' => 'jurusan.index', 'label' => 'Jurusan', 'icon' => 'briefcase', 'active' => 'jurusan.*'],
+        ['route' => 'guru.index', 'label' => 'Data Guru', 'icon' => 'user-group', 'active' => 'guru.*'],
+        ['route' => 'siswa.index', 'label' => 'Data Siswa', 'icon' => 'users', 'active' => 'siswa.*'],
+        ['route' => 'pustakawan.index', 'label' => 'Pustakawan', 'icon' => 'user-circle', 'active' => 'pustakawan.index'],
+    ] as $menu)
+        <a href="{{ route($menu['route']) }}" wire:navigate
+           class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs($menu['active']) ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+           :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+            
+            @if($menu['icon'] == 'academic-cap') <x-heroicon-o-academic-cap class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'calendar-days') <x-heroicon-o-calendar-days class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'briefcase') <x-heroicon-o-briefcase class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'user-group') <x-heroicon-o-user-group class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'users') <x-heroicon-o-users class="w-5 h-5 shrink-0" />
+            @elseif($menu['icon'] == 'user-circle') <x-heroicon-o-user-circle class="w-5 h-5 shrink-0" />
+            @endif
 
-                {{-- Menu Data Kelas --}}
-                <a href="{{ route('kelas.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('kelas.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-academic-cap class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Kelas</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Kelas</div>
-                </a>
+            <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">{{ $menu['label'] }}</span>
+            <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">{{ $menu['label'] }}</div>
+        </a>
+    @endforeach
 
-                {{-- Menu Tahun Ajaran --}}
-                <a href="{{ route('tahun-ajaran.index') }}" wire:navigate
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('tahun-ajaran.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-calendar-days class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Tahun Ajaran</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Tahun Ajaran</div>
-                </a>
+    {{-- SIRKULASI --}}
+    <div class="border-t border-slate-100 my-4 mx-2" x-show="!sidebarCollapsed"></div>
+    <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider transition-opacity duration-300">Sirkulasi</div>
 
-                {{-- Menu Jurusan --}}
-                <a href="{{ route('jurusan.index') }}" wire:navigate
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('jurusan.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-briefcase class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Jurusan</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Jurusan</div>
-                </a>
+    <a href="{{ route('peminjaman.index') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('peminjaman.*') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-clipboard-document-check class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Peminjaman</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Peminjaman</div>
+    </a>
 
-                {{-- Menu Data Guru --}}
-                <a href="{{ route('guru.index') }}" wire:navigate
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('guru.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-user-group class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Guru</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Guru</div>
-                </a>
+    <a href="{{ route('laporan.aktivitas') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('laporan.*') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-chart-bar class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Laporan</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Laporan</div>
+    </a>
 
-                {{-- Menu Pustakawan --}}
-                <a href="{{ route('pustakawan.index') }}" wire:navigate
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('pustakawan.index') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-user-circle class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Pustakawan</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Pustakawan</div>
-                </a>
+    {{-- PENGATURAN --}}
+    <div class="border-t border-slate-100 my-4 mx-2" x-show="!sidebarCollapsed"></div>
+    <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider transition-opacity duration-300">Pengaturan</div>
 
-                {{-- Menu Siswa --}}
-                <a href="{{ route('siswa.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('siswa.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-users class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Data Siswa</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Data Siswa</div>
-                </a>
+    <a href="{{ route('admin.index') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('admin.*') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-users class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Manajemen Admin</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Admin</div>
+    </a>
 
-                <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
+    <a href="{{ route('notifikasi.index') }}" wire:navigate
+    class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('notifikasi.*') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+    :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-bell class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Notifikasi</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Notifikasi</div>
+    </a>
 
-                {{-- LABEL: SIRKULASI --}}
-                <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Sirkulasi
-                </div>
+    <a href="{{ route('chat.index') }}" wire:navigate
+    class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('chat.index') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+    :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-chat-bubble-left-right class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Live Chat</span>
+    </a>
 
-                {{-- Menu Peminjaman --}}
-                <a href="{{ route('peminjaman.index') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('peminjaman.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-clipboard-document-check class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Peminjaman</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Peminjaman</div>
-                </a>
-
-                {{-- Menu Laporan --}}
-                <a href="{{ route('laporan.aktivitas') }}" wire:navigate
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('laporan.*') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-chart-bar class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Laporan</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Laporan</div>
-                </a>
-
-                <div class="border-t border-gray-100 my-3 mx-2" x-show="!sidebarCollapsed"></div>
-
-                {{-- LABEL: PENGATURAN --}}
-                <div x-show="!sidebarCollapsed" class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Pengaturan
-                </div>
-
-                <a href="{{ route('setting.landing-page') }}" wire:navigate
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('setting.landing-page') ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <x-heroicon-o-cog-6-tooth class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" />
-                    <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Landing Page</span>
-                    <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Landing Page</div>
-                </a>
+    <a href="{{ route('setting.landing-page') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('setting.landing-page') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-cog-6-tooth class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Landing Page</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Landing Page</div>
+    </a>
+</div>

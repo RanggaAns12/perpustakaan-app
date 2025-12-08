@@ -12,10 +12,11 @@ return new class extends Migration
             $table->id('peminjaman_id');
             $table->string('kode_transaksi', 20)->unique(); // PMJ-2024-001
             $table->foreignId('siswa_id')->constrained('siswas', 'siswa_id');
-            $table->foreignId('pustakawan_id')->constrained('pustakawans', 'pustakawan_id');
+            $table->foreignId('pustakawan_id')->nullable()->constrained('pustakawans', 'pustakawan_id');
             $table->date('tanggal_peminjaman');
             $table->date('tanggal_jatuh_tempo');
-            $table->enum('status_peminjaman', ['Dipinjam', 'Dikembalikan', 'Terlambat', 'Hilang'])->default('Dipinjam');
+            $table->enum('status_peminjaman', ['Pending', 'Dipinjam', 'Dikembalikan', 'Terlambat', 'Hilang', 'Ditolak'])
+                  ->default('Pending'); // Set default jadi Pending
             $table->text('catatan')->nullable();
             $table->timestamps();
         });

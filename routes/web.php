@@ -3,16 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// --- 1. Public & Auth (TETAP DI LUAR ADMIN) ---
+// --- 1. Public & Auth ---
 use App\Livewire\LandingPage;
 use App\Livewire\Auth\Login;
 
-// --- 2. Admin Components (NAMESPACE BARU) ---
-
-// Dashboard
+// --- 2. Admin Components ---
 use App\Livewire\Admin\Dashboard;
-
 use App\Livewire\Admin\Setting\LandingPageSetting;
+
 // Master Data
 use App\Livewire\Admin\Master\KategoriIndex;
 use App\Livewire\Admin\Master\KategoriCreate;
@@ -68,19 +66,27 @@ use App\Livewire\Admin\Peminjaman\PeminjamanCreate;
 use App\Livewire\Admin\Peminjaman\PeminjamanShow;
 use App\Livewire\Admin\Laporan\LaporanIndex;
 
-//Pustakawan Routes
+// Pustakawan Routes
 use App\Livewire\Pustakawan\Dashboard as PustakawanDashboard;
 use App\Livewire\Pustakawan\SirkulasiIndex;
 use App\Livewire\Pustakawan\BukuList;
-use App\Livewire\Pustakawan\Profile; // Import class
+use App\Livewire\Pustakawan\Profile;
 
-//Guru Routes
+// Guru Routes
 use App\Livewire\Guru\Dashboard as GuruDashboard;
 use App\Livewire\Guru\BukuList as GuruBukuList;
 use App\Livewire\Guru\Profile as GuruProfile;
 
-//siswa Routes
+// Siswa Routes
 use App\Livewire\Siswa\Dashboard as SiswaDashboard;
+use App\Livewire\Siswa\KatalogBuku;       // <-- Pastikan ini di-import
+use App\Livewire\Siswa\RiwayatPeminjaman; // <-- Pastikan ini di-import
+use App\Livewire\Siswa\NotifikasiSiswa;
+
+use App\Livewire\Chat\StaffChat;
+use App\Livewire\Notifikasi\NotifikasiIndex;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -95,9 +101,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
 });
 
-// 3. Authenticated Routes (ADMIN AREA)
+// 3. Authenticated Routes
 Route::middleware('auth')->group(function () {
-    
+
+    Route::get('/notifikasi', NotifikasiIndex::class)->name('notifikasi.index');
     // Logout
     Route::post('/logout', function () {
         Auth::logout();
@@ -106,7 +113,47 @@ Route::middleware('auth')->group(function () {
         return redirect('/');
     })->name('logout');
 
-    // Dashboard
+    // =========================================================================
+    // PERBAIKAN: ROUTES ROLE KHUSUS DIPINDAHKAN KE ATAS (SEBELUM ADMIN)
+    // =========================================================================
+
+    // --- Role: SISWA ---
+    // Dipindah ke sini agar URL '/siswa/dashboard' tidak dianggap sebagai ID '/siswa/{id}' oleh Admin
+    Route::middleware(['role:Siswa'])->prefix('siswa')->group(function () {
+        Route::get('/dashboard', SiswaDashboard::class)->name('siswa.dashboard');
+        Route::get('/katalog', \App\Livewire\Siswa\KatalogBuku::class)->name('siswa.katalog');
+        Route::get('/riwayat', \App\Livewire\Siswa\RiwayatPeminjaman::class)->name('siswa.riwayat');
+        Route::get('/peminjaman/create/{buku}', \App\Livewire\Siswa\PeminjamanCreate::class)->name('siswa.peminjaman.create');
+        Route::get('/siswa/notifikasi', NotifikasiSiswa::class)->name('siswa.notifikasi');
+    });
+
+    // --- Role: PUSTAKAWAN ---
+    Route::middleware(['role:Pustakawan'])->prefix('pustakawan')->group(function () {
+        Route::get('/dashboard', PustakawanDashboard::class)->name('pustakawan.dashboard');
+        Route::get('/sirkulasi', SirkulasiIndex::class)->name('pustakawan.sirkulasi');
+        Route::get('/transaksi/baru', PeminjamanCreate::class)->name('pustakawan.transaksi.create');
+        Route::get('/buku', BukuList::class)->name('pustakawan.buku');
+        Route::get('/profile', Profile::class)->name('pustakawan.profile');
+    });
+
+
+    Route::middleware(['auth', 'role:Admin,Pustakawan'])->group(function () {
+        // Route untuk Admin/Pustakawan membalas pesan
+        Route::get('/pesan-masuk', StaffChat::class)->name('chat.index');
+    });
+
+    // --- Role: GURU ---
+    Route::middleware(['role:Guru'])->prefix('guru')->group(function () {
+        Route::get('/dashboard', GuruDashboard::class)->name('guru.dashboard');
+        Route::get('/katalog-buku', GuruBukuList::class)->name('guru.buku');
+        Route::get('/profil', GuruProfile::class)->name('guru.profile');
+    });
+
+    // =========================================================================
+    // AREA ADMIN (Route Wildcard ada di bawah sini)
+    // =========================================================================
+
+    // Dashboard Admin
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // --- MODULE: Master Data ---
@@ -137,13 +184,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengaturan/landing-page', LandingPageSetting::class)->name('setting.landing-page');
     });
 
+    Route::prefix('pengguna')->group(function () {
+        Route::get('/admin', \App\Livewire\Admin\Pengguna\AdminIndex::class)->name('admin.index');
+        Route::get('/admin/create', \App\Livewire\Admin\Pengguna\AdminCreate::class)->name('admin.create');
+        
+        // Route Edit (Tambahan Baru)
+        Route::get('/admin/{id}/edit', \App\Livewire\Admin\Pengguna\AdminEdit::class)->name('admin.edit');
+    });
+
     // --- MODULE: Manajemen Buku ---
     Route::get('/buku', BukuIndex::class)->name('buku.index');
     Route::get('/buku/create', BukuCreate::class)->name('buku.create');
     Route::get('/buku/{buku}', BukuShow::class)->name('buku.show');
     Route::get('/buku/{buku}/edit', BukuEdit::class)->name('buku.edit');
 
-    // --- MODULE: Manajemen Siswa ---
+    // --- MODULE: Manajemen Siswa (ADMIN) ---
+    // Note: Route ini memiliki wildcard {siswa}, jadi harus diletakkan SETELAH route khusus siswa di atas.
     Route::get('/siswa', SiswaIndex::class)->name('siswa.index');
     Route::get('/siswa/create', SiswaCreate::class)->name('siswa.create');
     Route::get('/siswa/{siswa}', SiswaShow::class)->name('siswa.show');
@@ -167,31 +223,4 @@ Route::middleware('auth')->group(function () {
     // --- MODULE: Laporan ---
     Route::get('/laporan', LaporanIndex::class)->name('laporan.index');
     Route::get('/laporan/aktivitas', LaporanIndex::class)->name('laporan.aktivitas'); 
-
-
-    Route::middleware(['auth', 'role:Pustakawan'])->prefix('pustakawan')->group(function () {
-        // Dashboard
-        Route::get('/dashboard', PustakawanDashboard::class)->name('pustakawan.dashboard');
-        // Sirkulasi
-        Route::get('/sirkulasi', SirkulasiIndex::class)->name('pustakawan.sirkulasi');
-        // Create Transaksi (Menggunakan Logic Admin, tapi diakses Pustakawan)
-        Route::get('/transaksi/baru', PeminjamanCreate::class)->name('pustakawan.transaksi.create');
-        // Katalog Buku (Read Only)
-        Route::get('/buku', BukuList::class)->name('pustakawan.buku');
-        // Route Profil
-        Route::get('/profile', Profile::class)->name('pustakawan.profile');
-    });
-
-    Route::middleware(['auth', 'role:Guru'])->prefix('guru')->group(function () {
-        Route::get('/dashboard', GuruDashboard::class)->name('guru.dashboard');
-        Route::get('/katalog-buku', GuruBukuList::class)->name('guru.buku');
-        Route::get('/profil', GuruProfile::class)->name('guru.profile');
-    });
-
-    Route::middleware(['auth', 'role:Siswa'])->prefix('siswa')->group(function () {
-        // Route ini menggunakan layout 'components.layouts.siswa' (tanpa sidebar)
-        // karena sudah didefinisikan di dalam Class Component-nya
-        Route::get('/dashboard', SiswaDashboard::class)->name('siswa.dashboard');
-    });
-
 });
