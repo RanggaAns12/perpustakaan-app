@@ -3,22 +3,29 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\LandingSetting;
+use App\Models\Buku; // Tambahkan Model Buku
+use App\Models\Siswa; // Tambahkan Model Siswa
 use Livewire\Attributes\Layout;
-use App\Models\Buku;
-use App\Models\LandingSetting; // Import Model
 
 class LandingPage extends Component
 {
-    #[Layout('components.layouts.guest', ['title' => 'Selamat Datang di PerpusApp'])] 
+    #[Layout('components.layouts.guest')] 
     public function render()
     {
-        // Ambil pengaturan (jika kosong, buat instance baru agar tidak error)
-        $setting = LandingSetting::first() ?? new LandingSetting();
+        // 1. Ambil data setting (Baris Pertama)
+        $setting = LandingSetting::first();
 
+        // 2. Konversi ke array (jika ada datanya)
+        $data = $setting ? $setting->toArray() : [];
+
+        // 3. Tambahkan Statistik Real-time (Opsional, agar angka di landing page hidup)
+        $data['stats_buku'] = Buku::count();
+        $data['stats_siswa'] = Siswa::where('status_siswa', 'Aktif')->count();
+
+        // Kirim ke view
         return view('livewire.landing-page', [
-            'bukuTerbaru' => Buku::latest()->take(4)->get(),
-            'totalBuku' => Buku::count(),
-            'setting' => $setting, // Kirim variabel $setting ke view
+            'data' => $data
         ]);
     }
 }

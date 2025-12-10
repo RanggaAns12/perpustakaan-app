@@ -38,32 +38,37 @@ class LandingPageSetting extends Component
         $this->validate([
             'tagline' => 'required',
             'judul_hero' => 'required',
-            'gambar_hero_baru' => 'nullable|image|max:15048', // Max 2MB
+            'gambar_hero_baru' => 'nullable|image|max:15048', // Max 15MB
         ]);
 
-        $setting = LandingSetting::first();
+        // Ambil data setting, atau buat instance baru jika kosong
+        $setting = LandingSetting::firstOrNew();
 
+        // Ambil path gambar lama (jika ada)
         $pathGambar = $setting->gambar_hero;
 
         // Jika ada upload gambar baru
         if ($this->gambar_hero_baru) {
-            // Hapus gambar lama jika ada
-            if ($setting->gambar_hero && Storage::disk('public')->exists($setting->gambar_hero)) {
-                Storage::disk('public')->delete($setting->gambar_hero);
+            // Hapus gambar lama jika ada datanya DAN filenya ada di storage
+            if ($pathGambar && Storage::disk('public')->exists($pathGambar)) {
+                Storage::disk('public')->delete($pathGambar);
             }
+            // Simpan gambar baru
             $pathGambar = $this->gambar_hero_baru->store('landing-page', 'public');
         }
 
-        $setting->update([
-            'tagline' => $this->tagline,
-            'judul_hero' => $this->judul_hero,
-            'deskripsi_hero' => $this->deskripsi_hero,
-            'text_cta' => $this->text_cta,
-            'alamat' => $this->alamat,
-            'telepon' => $this->telepon,
-            'email' => $this->email,
-            'gambar_hero' => $pathGambar,
-        ]);
+        // Update atribut model (gunakan fill atau set manual)
+        $setting->tagline = $this->tagline;
+        $setting->judul_hero = $this->judul_hero;
+        $setting->deskripsi_hero = $this->deskripsi_hero;
+        $setting->text_cta = $this->text_cta;
+        $setting->alamat = $this->alamat;
+        $setting->telepon = $this->telepon;
+        $setting->email = $this->email;
+        $setting->gambar_hero = $pathGambar;
+
+        // Simpan ke database (save() akan otomatis Insert jika baru, atau Update jika lama)
+        $setting->save();
 
         session()->flash('message', 'Pengaturan Landing Page berhasil diperbarui.');
     }

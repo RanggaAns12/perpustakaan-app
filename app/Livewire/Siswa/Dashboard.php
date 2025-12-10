@@ -38,7 +38,7 @@ class Dashboard extends Component
 
         $bukuTerbaru = Buku::with(['kategori', 'penulis'])
             ->latest()
-            ->take(5)
+            ->take(6)
             ->get();
 
         $kategoris = Kategori::withCount('bukus')

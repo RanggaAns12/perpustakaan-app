@@ -9,11 +9,11 @@
 
 /* --- 2. KONFIGURASI TEMA --- */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* --- 3. GLOBAL UTILITIES --- */
-[x-cloak] { 
+[x-cloak] {
     display: none !important; 
 }
 
@@ -40,17 +40,14 @@
 /* --- 5. COMPONENT STYLES --- */
 
 /* INPUT FIELD */
-/* Note: Class 'peer' KITA HAPUS dari @apply di sini agar tidak error. */
-/* Class 'peer' wajib ditulis manual di HTML <input>. */
 .input-field {
     @apply block px-4 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 transition-all duration-300;
 }
 
 /* LABEL FIELD */
-/* Perbaikan: Mengganti 'origin-[0]' menjadi 'origin-left' (Standar v4) */
 .input-label {
     @apply absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-left start-4 
-    pointer-events-none /* <--- TAMBAHKAN INI */
+    pointer-events-none
     peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 
     peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-indigo-600;
 }
@@ -64,7 +61,6 @@
     box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
-
 @keyframes progress-indeterminate {
   0% { width: 0%; margin-left: 0%; }
   50% { width: 50%; margin-left: 25%; }
@@ -74,4 +70,3 @@
 .animate-progress {
     animation: progress-indeterminate 1.5s infinite linear;
 }
-
