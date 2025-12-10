@@ -182,6 +182,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/tahun-ajaran/create', TahunAjaranCreate::class)->name('tahun-ajaran.create');
         Route::get('/tahun-ajaran/{tahun}/edit', TahunAjaranEdit::class)->name('tahun-ajaran.edit');
         Route::get('/pengaturan/landing-page', LandingPageSetting::class)->name('setting.landing-page');
+        Route::get('/admin/setting/galeri', \App\Livewire\Admin\Setting\GaleriManager::class)->name('setting.galeri');
     });
 
     Route::prefix('pengguna')->group(function () {

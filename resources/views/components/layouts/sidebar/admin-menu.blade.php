@@ -113,6 +113,7 @@
     :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
         <x-heroicon-o-chat-bubble-left-right class="w-5 h-5 shrink-0" />
         <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Live Chat</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Live Chat</div>
     </a>
 
     <a href="{{ route('setting.landing-page') }}" wire:navigate
@@ -121,5 +122,14 @@
         <x-heroicon-o-cog-6-tooth class="w-5 h-5 shrink-0" />
         <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Landing Page</span>
         <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Landing Page</div>
+    </a>
+
+    {{-- LINK GALERI BARU --}}
+    <a href="{{ route('setting.galeri') }}" wire:navigate
+       class="flex items-center rounded-xl transition-all duration-200 group relative py-2.5 min-h-[44px] {{ request()->routeIs('setting.galeri') ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-100' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600' }}"
+       :class="sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3'">
+        <x-heroicon-o-photo class="w-5 h-5 shrink-0" />
+        <span x-show="!sidebarCollapsed" class="whitespace-nowrap text-sm">Kelola Galeri</span>
+        <div x-show="sidebarCollapsed" class="hidden lg:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none shadow-lg">Kelola Galeri</div>
     </a>
 </div>
